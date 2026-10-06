@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+backups/
+.env
+cloud-credentials.txt

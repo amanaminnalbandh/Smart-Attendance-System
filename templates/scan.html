@@ -1,0 +1,471 @@
+{% extends "base.html" %}
+
+{% block title %}Live Scanner · Smart Attendance{% endblock %}
+{% block page %}scanner{% endblock %}
+
+{% block content %}
+
+<div
+  id="scanner-page"
+  data-mode="{{ mode }}"
+>
+
+  <div class="page-head">
+
+    <div>
+
+      <p class="eyebrow">
+        Attendance scanner
+      </p>
+
+      <h1 id="scanner-title">
+        Live Scanner
+      </h1>
+
+      <p class="lede">
+        Keep the camera steady and make sure the student or QR code
+        is clearly visible.
+      </p>
+
+    </div>
+
+    <div class="actions">
+
+      <a
+        href="/"
+        class="button secondary"
+      >
+        Back to Dashboard
+      </a>
+
+      <a
+        href="/scan?mode=face"
+        class="button secondary"
+      >
+        Face Scanner
+      </a>
+
+      <a
+        href="/scan?mode=qr"
+        class="button secondary"
+      >
+        QR Scanner
+      </a>
+
+    </div>
+
+  </div>
+
+
+  <!-- CURRENT SUBJECT SESSION -->
+
+  <section class="card">
+
+    <div class="card-title">
+
+      <div>
+
+        <h2>
+          Current Attendance Session
+        </h2>
+
+        <p>
+          Scanner works only while a subject session is active.
+        </p>
+
+      </div>
+
+      <span
+        id="scanner-session-badge"
+        class="badge"
+      >
+        Checking...
+      </span>
+
+    </div>
+
+
+    <div
+      id="scanner-session-info"
+      class="help"
+    >
+      Checking active subject session...
+    </div>
+
+  </section>
+
+
+  <!-- CAMERA -->
+
+  <section class="card">
+
+    <div class="card-title">
+
+      <div>
+
+        <h2 id="camera-heading">
+          Camera Scanner
+        </h2>
+
+        <p id="camera-description">
+          Allow camera permission when your browser asks.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      style="
+        max-width: 720px;
+        margin: 0 auto;
+      "
+    >
+
+      <video
+        id="scanner-video"
+        autoplay
+        playsinline
+        muted
+        style="
+          width: 100%;
+          border-radius: 16px;
+          background: #111827;
+          display: block;
+          min-height: 300px;
+          object-fit: cover;
+        "
+      ></video>
+
+
+      <canvas
+        id="scanner-canvas"
+        hidden
+      ></canvas>
+
+    </div>
+
+
+    <div class="actions space-top">
+
+      <button
+        id="start-camera-button"
+        type="button"
+      >
+        Start Camera
+      </button>
+
+
+      <button
+        id="stop-camera-button"
+        type="button"
+        class="secondary"
+        disabled
+      >
+        Stop Camera
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- SCAN STATUS -->
+
+  <section class="card">
+
+    <h2>
+      Scan status
+    </h2>
+
+
+    <div
+      id="scan-status"
+      class="scan-result scan-result-info"
+      role="status"
+      aria-live="polite"
+    >
+
+      <div
+        class="scan-result-text"
+        id="scan-status-text"
+      >
+        Start the camera to begin scanning.
+      </div>
+
+
+      <div
+        class="scan-result-icon"
+        id="scan-status-icon"
+        aria-hidden="true"
+      >
+        •
+      </div>
+
+    </div>
+
+
+    <!-- SUCCESS DETAILS -->
+
+    <div
+      id="scan-success-details"
+      class="help"
+      hidden
+    >
+
+      <p>
+        <strong>Student:</strong>
+        <span id="success-student">—</span>
+      </p>
+
+      <p>
+        <strong>Subject:</strong>
+        <span id="success-subject">—</span>
+      </p>
+
+      <p>
+        <strong>Method:</strong>
+        <span id="success-method">—</span>
+      </p>
+
+    </div>
+
+
+    <!-- QR INSTRUCTIONS -->
+
+    <div id="qr-help">
+
+      <ol>
+
+        <li>
+          Print the student's private QR card or open it on another screen.
+        </li>
+
+        <li>
+          Hold the entire QR in front of the camera,
+          with all corners inside the frame.
+        </li>
+
+        <li>
+          Keep the card steady until you see a green confirmation.
+        </li>
+
+      </ol>
+
+
+      <div class="help">
+
+        <p>
+          <strong>QR limitation:</strong>
+          A QR can be copied. The teacher must also verify the student's identity.
+        </p>
+
+        <p>
+          Live webcam scanning needs a printed card or another screen.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- FACE INSTRUCTIONS -->
+
+    <div
+      id="face-help"
+      hidden
+    >
+
+      <ol>
+
+        <li>
+          Keep only one face inside the camera frame.
+        </li>
+
+        <li>
+          Look directly at the camera in good lighting.
+        </li>
+
+        <li>
+          Hold still until all three face checks are completed.
+        </li>
+
+      </ol>
+
+
+      <div class="help">
+
+        <p>
+          Face recognition is for supervised classroom demonstration use.
+          Verify the student when necessary.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="help space-top">
+
+      <p>
+        <strong>Camera not working?</strong>
+        Allow camera access in the browser's address bar and close
+        other applications using the webcam.
+      </p>
+
+      <p>
+        Open this page using localhost or HTTPS.
+      </p>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<style>
+
+.scan-result {
+  width: 100%;
+  min-height: 84px;
+
+  padding: 18px 20px;
+
+  margin: 14px 0 22px;
+
+  border-radius: 14px;
+
+  border: 1px solid;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  font-size: 17px;
+
+  line-height: 1.5;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.scan-result-text {
+  flex: 1;
+}
+
+
+.scan-result-icon {
+  flex-shrink: 0;
+
+  width: 46px;
+  height: 46px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 28px;
+
+  font-weight: 900;
+}
+
+
+/* INFO */
+
+.scan-result-info {
+  background: #eff6ff;
+
+  border-color: #bfdbfe;
+
+  color: #1e40af;
+}
+
+
+.scan-result-info .scan-result-icon {
+  background: #dbeafe;
+
+  color: #1d4ed8;
+}
+
+
+/* WARNING */
+
+.scan-result-warning {
+  background: #fff4d6;
+
+  border-color: #f3cf77;
+
+  color: #8a5700;
+}
+
+
+.scan-result-warning .scan-result-icon {
+  background: #fde7a7;
+
+  color: #8a5700;
+}
+
+
+/* SUCCESS */
+
+.scan-result-success {
+  background: #dcfce7;
+
+  border-color: #86efac;
+
+  color: #166534;
+}
+
+
+.scan-result-success .scan-result-icon {
+  background: #16a34a;
+
+  color: white;
+}
+
+
+/* ERROR */
+
+.scan-result-error {
+  background: #fee2e2;
+
+  border-color: #fca5a5;
+
+  color: #991b1b;
+}
+
+
+.scan-result-error .scan-result-icon {
+  background: #dc2626;
+
+  color: white;
+}
+
+
+#scan-success-details p {
+  margin:
+    6px 0;
+}
+
+</style>
+
+
+<script
+  src="{{ url_for('static', filename='scan.js') }}"
+  defer>
+</script>
+
+{% endblock %}

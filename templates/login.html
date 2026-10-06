@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Teacher login · Smart Attendance</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="login-shell">
+    <section class="login-card">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">SA</span><span><span class="brand-name">Smart Attendance</span><span class="brand-note">Face + QR · Laptop project</span></span></div>
+      <p class="eyebrow">Teacher / Admin</p>
+      <h1>Start taking attendance</h1>
+      <p class="lede">Register students, record attendance with your camera and download the daily report.</p>
+      {% if error %}<div class="status error" role="alert">{{ error }}</div>{% endif %}
+      <form action="/login" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field"><label for="username">Username</label><input id="username" name="username" autocomplete="username" required autofocus maxlength="100"></div>
+        <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+        <button type="submit">Log in</button>
+      </form>
+      <p class="note login-note">Login details are set during project setup. Keep them private.</p>
+    </section>
+  </main>
+</body>
+</html>

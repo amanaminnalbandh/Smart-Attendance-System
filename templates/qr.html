@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Student QR card · Smart Attendance{% endblock %}
+{% block page %}qr{% endblock %}
+{% block body_attrs %}data-student-id="{{ student_id }}"{% endblock %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">Student card</p><h1>Private attendance QR.</h1><p class="lede">Give this card only to its student. For live webcam scanning, print it or use another screen. With only a laptop, test the downloaded PNG in the QR demo.</p></div><div class="actions"><button id="print-button" type="button" disabled>Print card</button><a class="button secondary" href="/api/students/{{ student_id }}/qr.png" download="attendance-qr.png">Download QR PNG</a><a class="button secondary" href="/">Dashboard</a></div></div>
+<div id="page-status" class="status" role="status" aria-live="polite" hidden></div>
+<section class="qr-card" id="qr-card" hidden><p class="eyebrow">Smart Attendance</p><h2 id="qr-name"></h2><div class="qr-roll" id="qr-code"></div><img id="qr-image" alt="Student's private attendance QR code"><span class="badge" id="qr-active"></span><p class="qr-note">Do not share copies of this card. Scan it for attendance in the teacher's presence. Reissuing the QR invalidates this card.</p></section>
+{% endblock %}

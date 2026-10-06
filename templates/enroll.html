@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Face enrollment · Smart Attendance{% endblock %}
+{% block page %}enroll{% endblock %}
+{% block body_attrs %}data-student-id="{{ student_id }}"{% endblock %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">Face enrollment · Step 2</p><h1 id="enroll-name">Collect face samples.</h1><p class="lede" id="enroll-description">Checking the student's consent and registration…</p></div><a class="button secondary" href="/">Dashboard</a></div>
+<div class="camera-layout">
+  <section class="card">
+    <div class="camera-wrap"><video id="camera-video" autoplay playsinline muted aria-label="Face enrollment webcam preview"></video><div class="camera-placeholder" id="camera-placeholder"><div><span class="camera-symbol" aria-hidden="true">▣</span>Seat the student in front of the camera.<br>Press Start to collect samples.</div></div></div>
+    <p class="camera-caption">Only accepted face crops are saved. The camera does not start automatically.</p>
+    <div class="camera-controls"><button id="camera-start" type="button" disabled>Start enrollment</button><button id="camera-stop" type="button" class="secondary" disabled>Stop camera</button></div>
+  </section>
+  <section class="card">
+    <h2>Sample progress</h2><div class="progress-label"><span>Accepted samples</span><span id="sample-count">0 / 25</span></div><progress id="sample-progress" value="0" max="25" aria-label="Accepted face samples">0 / 25</progress>
+    <div id="page-status" class="status" role="status" aria-live="polite">Loading student details…</div>
+    <ol class="instruction-list"><li>Use a clear background and even lighting.</li><li>Only the enrolled student's face should be in the frame.</li><li>Look slightly left, slightly right and straight ahead. Stay about an arm's length from the camera.</li><li>The camera stops after 25 accepted samples. Train the model on the dashboard.</li></ol>
+    <div class="help"><p>Enrollment stops after 2 minutes. Rejected frames do not count toward progress.</p><p>Training requires at least 20 samples. If samples are already saved, their count will be shown.</p></div>
+    <a class="button secondary space-top" href="/">Train on the dashboard</a>
+  </section>
+</div>
+{% endblock %}

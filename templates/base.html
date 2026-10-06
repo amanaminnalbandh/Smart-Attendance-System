@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="csrf-token"
+    content="{{ csrf_token|default('') }}"
+  >
+
+  <title>
+    {% block title %}
+      Smart Attendance
+    {% endblock %}
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+  >
+
+  <script
+    src="{{ url_for('static', filename='app.js') }}"
+    defer>
+  </script>
+
+</head>
+
+
+<body
+  data-page="{% block page %}dashboard{% endblock %}"
+  {% block body_attrs %}{% endblock %}
+>
+
+
+<!-- ===================================================== -->
+<!-- APP LAYOUT -->
+<!-- ===================================================== -->
+
+<div class="app-shell">
+
+
+  <!-- =================================================== -->
+  <!-- LEFT SIDEBAR -->
+  <!-- =================================================== -->
+
+  <aside class="sidebar">
+
+
+    <!-- LOGO -->
+
+    <a
+      href="/"
+      class="sidebar-brand"
+      aria-label="Smart Attendance Dashboard"
+    >
+
+      <span
+        class="sidebar-logo"
+        aria-hidden="true"
+      >
+        SA
+      </span>
+
+
+      <span class="sidebar-brand-text">
+
+        <strong>
+          Smart Attendance
+        </strong>
+
+        <small>
+          Face • QR • Manual
+        </small>
+
+      </span>
+
+    </a>
+
+
+
+    <!-- MAIN MENU -->
+
+    <nav
+      class="sidebar-nav"
+      aria-label="Main navigation"
+    >
+
+
+      <!-- DASHBOARD -->
+
+      <a
+        href="/"
+        class="sidebar-link
+        {% if request.path == '/' %}
+          active
+        {% endif %}"
+      >
+
+        <span class="sidebar-icon">
+          ⌂
+        </span>
+
+        <span>
+          Dashboard
+        </span>
+
+      </a>
+
+
+
+      <!-- STUDENTS -->
+
+      <a
+        href="/#students-section"
+        class="sidebar-link"
+      >
+
+        <span class="sidebar-icon">
+          ♟
+        </span>
+
+        <span>
+          Students
+        </span>
+
+      </a>
+
+
+
+      <!-- SESSION -->
+
+      <a
+        href="/#subject-session-card"
+        class="sidebar-link
+        {% if request.path == '/sessions' %}
+          active
+        {% endif %}"
+      >
+
+        <span class="sidebar-icon">
+          ▣
+        </span>
+
+        <span>
+          Sessions
+        </span>
+
+      </a>
+
+
+
+      <!-- FACE SCANNER -->
+
+      <a
+        href="/scan?mode=face"
+        class="sidebar-link
+        {% if request.path == '/scan' %}
+          active
+        {% endif %}"
+      >
+
+        <span class="sidebar-icon">
+          ◉
+        </span>
+
+        <span>
+          Live Scanner
+        </span>
+
+      </a>
+
+
+
+      <!-- QR SCANNER -->
+
+      <a
+        href="/scan?mode=qr"
+        class="sidebar-link"
+      >
+
+        <span class="sidebar-icon">
+          ▦
+        </span>
+
+        <span>
+          QR Scanner
+        </span>
+
+      </a>
+
+
+
+      <!-- REPORT -->
+
+      <a
+        href="/#attendance-section"
+        class="sidebar-link"
+      >
+
+        <span class="sidebar-icon">
+          ▤
+        </span>
+
+        <span>
+          Reports
+        </span>
+
+      </a>
+
+
+    </nav>
+
+
+
+    <!-- PUSH BOTTOM -->
+
+    <div class="sidebar-spacer"></div>
+
+
+
+    <!-- SYSTEM AREA -->
+
+    <div class="sidebar-system">
+
+
+      <div class="sidebar-label">
+        SYSTEM
+      </div>
+
+
+
+      <!-- TEACHER -->
+
+      <div class="teacher-profile">
+
+        <span class="teacher-avatar">
+          T
+        </span>
+
+
+        <span class="teacher-info">
+
+          <strong>
+            Teacher
+          </strong>
+
+          <small>
+            Faculty
+          </small>
+
+        </span>
+
+      </div>
+
+
+
+      <!-- LOGOUT -->
+
+      <button
+        class="sidebar-link logout-link"
+        id="logout-button"
+        type="button"
+      >
+
+        <span class="sidebar-icon">
+          ↪
+        </span>
+
+        <span>
+          Log out
+        </span>
+
+      </button>
+
+
+    </div>
+
+
+  </aside>
+
+
+
+  <!-- =================================================== -->
+  <!-- RIGHT SIDE MAIN CONTENT -->
+  <!-- =================================================== -->
+
+  <div class="main-shell">
+
+
+    <!-- MOBILE HEADER -->
+
+    <header class="mobile-header">
+
+      <a
+        href="/"
+        class="mobile-logo"
+      >
+
+        <span class="mobile-logo-mark">
+          SA
+        </span>
+
+        <span>
+          Smart Attendance
+        </span>
+
+      </a>
+
+
+      <div class="mobile-teacher">
+
+        <span class="teacher-avatar">
+          T
+        </span>
+
+        <span>
+          Teacher
+        </span>
+
+      </div>
+
+    </header>
+
+
+
+    <!-- ================================================= -->
+    <!-- PAGE CONTENT -->
+    <!-- ================================================= -->
+
+    <main class="wrap">
+
+      {% block content %}
+      {% endblock %}
+
+    </main>
+
+
+
+    <!-- ================================================= -->
+    <!-- FOOTER -->
+    <!-- ================================================= -->
+
+    <footer class="footer">
+
+      <span>
+        Smart Attendance System
+      </span>
+
+
+      <span>
+        Face • QR • Manual Attendance
+      </span>
+
+
+      <span>
+        Timezone: Asia/Kolkata
+      </span>
+
+    </footer>
+
+
+  </div>
+
+
+</div>
+
+
+</body>
+
+</html>

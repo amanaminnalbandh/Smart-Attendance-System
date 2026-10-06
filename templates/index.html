@@ -1,0 +1,997 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard · Smart Attendance{% endblock %}
+{% block page %}dashboard{% endblock %}
+
+{% block content %}
+
+<!-- ====================================================== -->
+<!-- HERO / DASHBOARD HEADER -->
+<!-- ====================================================== -->
+
+<section class="page-head dashboard-hero">
+
+  <div class="hero-copy">
+
+    <p class="eyebrow">
+      Welcome, Teacher 👋
+    </p>
+
+    <h1>
+      Smart Attendance Dashboard
+    </h1>
+
+    <p class="lede">
+      Manage students, take attendance using face recognition,
+      QR codes or manual entry — all in one place.
+    </p>
+
+  </div>
+
+
+  <div class="actions hero-actions">
+
+    <a
+      class="button hero-primary"
+      href="/scan?mode=face"
+    >
+      ◉ Open Live Scanner
+    </a>
+
+    <a
+      class="button secondary"
+      href="/api/attendance.csv"
+    >
+      ⇩ CSV Report
+    </a>
+
+    <a
+      class="button secondary"
+      href="/api/audit.csv"
+    >
+      ▤ Audit CSV
+    </a>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- GLOBAL STATUS -->
+<!-- ====================================================== -->
+
+<div
+  id="page-status"
+  class="status"
+  role="status"
+  aria-live="polite"
+  hidden
+></div>
+
+
+
+<!-- ====================================================== -->
+<!-- DASHBOARD STATS -->
+<!-- ====================================================== -->
+
+<section
+  class="stats dashboard-stats"
+  aria-label="Attendance overview"
+>
+
+
+  <!-- ACTIVE STUDENTS -->
+
+  <article class="stat stat-green">
+
+    <div class="stat-icon stat-icon-green">
+      👥
+    </div>
+
+    <div class="stat-content">
+
+      <div class="stat-label">
+        Active Students
+      </div>
+
+      <div
+        class="stat-value"
+        id="active-count"
+      >
+        —
+      </div>
+
+      <div class="stat-note">
+        Registered and active
+      </div>
+
+    </div>
+
+  </article>
+
+
+
+  <!-- PRESENT TODAY -->
+
+  <article class="stat stat-blue">
+
+    <div class="stat-icon stat-icon-blue">
+      ✓
+    </div>
+
+    <div class="stat-content">
+
+      <div class="stat-label">
+        Present Today
+      </div>
+
+      <div
+        class="stat-value"
+        id="present-count"
+      >
+        —
+      </div>
+
+      <div
+        class="stat-note"
+        id="today-label"
+      >
+        Loading…
+      </div>
+
+    </div>
+
+  </article>
+
+
+
+  <!-- NOT MARKED -->
+
+  <article class="stat stat-orange">
+
+    <div class="stat-icon stat-icon-orange">
+      ◷
+    </div>
+
+    <div class="stat-content">
+
+      <div class="stat-label">
+        Not Marked Today
+      </div>
+
+      <div
+        class="stat-value"
+        id="absent-count"
+      >
+        —
+      </div>
+
+      <div class="stat-note">
+        Active students not marked yet
+      </div>
+
+    </div>
+
+  </article>
+
+
+
+  <!-- FACE MODEL -->
+
+  <article class="stat stat-purple">
+
+    <div class="stat-icon stat-icon-purple">
+      ✺
+    </div>
+
+    <div class="stat-content">
+
+      <div class="stat-label">
+        Face Model
+      </div>
+
+      <div
+        class="stat-value model-stat-value"
+        id="model-label"
+      >
+        —
+      </div>
+
+      <div
+        class="stat-note"
+        id="model-note"
+      >
+        Loading…
+      </div>
+
+    </div>
+
+  </article>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- TOP DASHBOARD GRID -->
+<!-- ====================================================== -->
+
+<section class="dashboard-grid-primary">
+
+
+  <!-- ==================================================== -->
+  <!-- SUBJECT SESSION -->
+  <!-- ==================================================== -->
+
+  <article
+    class="card session-card"
+    id="subject-session-card"
+  >
+
+
+    <div class="card-title">
+
+      <div class="title-with-icon">
+
+        <span class="card-icon green-icon">
+          📖
+        </span>
+
+        <div>
+
+          <h2>
+            Subject Attendance Session
+          </h2>
+
+          <p>
+            Select a subject and start a 60-minute attendance session.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <span
+        class="badge bad session-status"
+        id="session-badge"
+      >
+        Scanner Closed
+      </span>
+
+    </div>
+
+
+
+    <!-- SUBJECT + TIMER -->
+
+    <div class="session-form-grid">
+
+
+      <div class="field">
+
+        <label for="session-subject">
+          Subject
+        </label>
+
+        <select id="session-subject">
+
+          <option value="">
+            Loading subjects...
+          </option>
+
+        </select>
+
+      </div>
+
+
+
+      <div class="field timer-field">
+
+        <label>
+          Remaining Time
+        </label>
+
+        <div class="timer-display">
+
+          <span class="timer-clock">
+            ◷
+          </span>
+
+          <span id="session-timer">
+            --:--
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- SESSION BUTTONS -->
+
+    <div class="session-actions">
+
+
+      <button
+        id="start-session-button"
+        type="button"
+      >
+        ▶ Start 1-Hour Session
+      </button>
+
+
+
+      <button
+        id="end-session-button"
+        type="button"
+        class="session-stop"
+        disabled
+      >
+        ■ End Session
+      </button>
+
+
+
+      <a
+        id="session-face-scanner"
+        class="button scanner-light"
+        href="/scan?mode=face"
+      >
+        ◉ Face Scanner
+      </a>
+
+
+
+      <a
+        id="session-qr-scanner"
+        class="button scanner-light"
+        href="/scan?mode=qr"
+      >
+        ▦ QR Scanner
+      </a>
+
+    </div>
+
+
+
+    <!-- SESSION INFORMATION -->
+
+    <div class="session-info-strip">
+
+      <div class="info-circle">
+        i
+      </div>
+
+      <div>
+
+        <strong>
+          Subjects:
+        </strong>
+
+        Java, Python, Cloud Computing,
+        Data Science, DBMS, Computer Networks.
+
+        <div id="session-information">
+          Select a subject and start attendance.
+        </div>
+
+      </div>
+
+    </div>
+
+  </article>
+
+
+
+  <!-- ==================================================== -->
+  <!-- ADD STUDENT -->
+  <!-- ==================================================== -->
+
+  <article class="card mini-card add-student-card">
+
+
+    <div class="card-title">
+
+      <div class="title-with-icon">
+
+        <span class="card-icon green-icon">
+          ＋
+        </span>
+
+        <div>
+
+          <h2>
+            Add a New Student
+          </h2>
+
+          <p>
+            Each student must have a unique roll number or ID.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <span class="badge good">
+        Step 1
+      </span>
+
+    </div>
+
+
+
+    <form id="student-form">
+
+
+      <div class="form-grid compact-form-grid">
+
+
+        <div class="field">
+
+          <label for="student-name">
+
+            Full name
+
+            <span class="required">
+              *
+            </span>
+
+          </label>
+
+
+          <input
+            id="student-name"
+            name="name"
+            required
+            maxlength="100"
+            placeholder="e.g. Ayaan Khan"
+            autocomplete="off"
+          >
+
+        </div>
+
+
+
+        <div class="field">
+
+          <label for="student-code">
+
+            Roll number / ID
+
+            <span class="required">
+              *
+            </span>
+
+          </label>
+
+
+          <input
+            id="student-code"
+            name="student_code"
+            required
+            maxlength="64"
+            placeholder="e.g. CSE-001"
+            autocomplete="off"
+          >
+
+        </div>
+
+      </div>
+
+
+
+      <label class="check compact-check">
+
+
+        <input
+          id="face-consent"
+          type="checkbox"
+          name="face_consent"
+        >
+
+
+        <span>
+
+          The student has given informed consent to store
+          face samples and the trained model.
+
+          QR attendance can be used without face enrollment.
+
+        </span>
+
+      </label>
+
+
+
+      <button
+        type="submit"
+        class="wide-action"
+      >
+        ＋ Add Student
+      </button>
+
+
+    </form>
+
+  </article>
+
+
+
+  <!-- ==================================================== -->
+  <!-- TRAIN MODEL -->
+  <!-- ==================================================== -->
+
+  <article class="card mini-card train-card">
+
+
+    <div class="card-title">
+
+      <div class="title-with-icon">
+
+        <span class="card-icon purple-icon">
+          ✺
+        </span>
+
+        <div>
+
+          <h2>
+            Train the Face Model
+          </h2>
+
+          <p>
+            Complete this after collecting face samples.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <span class="badge good">
+        Step 3
+      </span>
+
+    </div>
+
+
+
+    <div class="help">
+
+      <p>
+
+        Each student needs at least
+
+        <strong id="min-samples">
+          20
+        </strong>
+
+        accepted samples.
+
+      </p>
+
+
+      <p>
+        Retrain after adding or deactivating
+        a student or updating face samples.
+      </p>
+
+    </div>
+
+
+
+    <div class="actions space-top">
+
+
+      <button
+        id="train-button"
+        type="button"
+        class="purple-button"
+      >
+        ⚙ Train Model
+      </button>
+
+
+      <a
+        class="button scanner-light"
+        href="/scan?mode=qr"
+      >
+        ▦ QR Scanner
+      </a>
+
+
+    </div>
+
+
+
+    <div class="quality-tip">
+
+      ● Face recognition depends on lighting and camera quality.
+
+      This project is intended for classroom demonstrations
+      and supervised use.
+
+    </div>
+
+
+  </article>
+
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- STUDENT + MANUAL GRID -->
+<!-- ====================================================== -->
+
+<section class="dashboard-grid-secondary">
+
+
+
+  <!-- ==================================================== -->
+  <!-- STUDENTS -->
+  <!-- ==================================================== -->
+
+  <article
+    class="card students-card"
+    id="students-section"
+  >
+
+
+    <div class="card-title">
+
+
+      <div class="title-with-icon">
+
+        <span class="card-icon green-icon">
+          👥
+        </span>
+
+        <div>
+
+          <h2>
+            Students
+          </h2>
+
+          <p>
+            Manage face samples, private QR cards and student access.
+          </p>
+
+        </div>
+
+      </div>
+
+
+
+      <button
+        id="refresh-button"
+        class="secondary small"
+        type="button"
+      >
+        ↻ Refresh
+      </button>
+
+
+    </div>
+
+
+
+    <div class="table-scroll">
+
+
+      <table class="data-table">
+
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Student
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Face Samples
+            </th>
+
+            <th>
+              Actions
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+
+        <tbody id="students-body">
+
+
+          <tr>
+
+            <td
+              colspan="4"
+              class="empty"
+            >
+              Loading students…
+            </td>
+
+          </tr>
+
+
+        </tbody>
+
+
+      </table>
+
+
+    </div>
+
+
+
+    <p class="note note-top table-note">
+
+      ⓘ Reissuing a QR immediately invalidates the old card.
+
+      Give each student their card privately;
+      a copied card can be used for proxy attendance.
+
+    </p>
+
+
+  </article>
+
+
+
+  <!-- ==================================================== -->
+  <!-- MANUAL ATTENDANCE -->
+  <!-- ==================================================== -->
+
+  <article class="card manual-card">
+
+
+    <div class="card-title">
+
+
+      <div class="title-with-icon">
+
+
+        <span class="card-icon orange-icon">
+          ✎
+        </span>
+
+
+        <div>
+
+          <h2>
+            Manual Attendance
+          </h2>
+
+          <p>
+            Start a subject session first.
+            Use manual attendance only after verifying the student.
+          </p>
+
+        </div>
+
+
+      </div>
+
+
+
+      <span class="badge bad">
+        Reason Required
+      </span>
+
+
+    </div>
+
+
+
+    <form id="manual-form">
+
+
+      <div class="form-grid">
+
+
+        <div class="field">
+
+
+          <label for="manual-student">
+            Student
+          </label>
+
+
+          <select
+            id="manual-student"
+            required
+          >
+
+            <option value="">
+              Select a student
+            </option>
+
+          </select>
+
+
+        </div>
+
+
+
+        <div class="field">
+
+
+          <label for="manual-reason">
+            Reason
+          </label>
+
+
+          <textarea
+            id="manual-reason"
+            required
+            minlength="5"
+            maxlength="500"
+            placeholder="e.g. Webcam unavailable; teacher verified the student."
+          ></textarea>
+
+
+        </div>
+
+
+      </div>
+
+
+
+      <button
+        type="submit"
+        class="manual-button"
+      >
+        ✓ Mark Present Manually
+      </button>
+
+
+    </form>
+
+
+  </article>
+
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- ATTENDANCE REGISTER -->
+<!-- ====================================================== -->
+
+<section
+  class="card attendance-card"
+  id="attendance-section"
+>
+
+
+  <div class="card-title">
+
+
+    <div class="title-with-icon">
+
+
+      <span class="card-icon green-icon">
+        ▦
+      </span>
+
+
+      <div>
+
+        <h2>
+          Today's Attendance Register
+        </h2>
+
+        <p>
+          Each student can be marked once per subject session.
+        </p>
+
+      </div>
+
+
+    </div>
+
+
+
+    <a
+      href="/api/attendance.csv"
+      class="button secondary small"
+    >
+      ⇩ Download CSV
+    </a>
+
+
+  </div>
+
+
+
+  <div class="table-scroll">
+
+
+    <table class="data-table">
+
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Student
+          </th>
+
+          <th>
+            Subject
+          </th>
+
+          <th>
+            Time
+          </th>
+
+          <th>
+            Method
+          </th>
+
+          <th>
+            Correction
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+
+      <tbody id="attendance-body">
+
+
+        <tr>
+
+          <td
+            colspan="5"
+            class="empty"
+          >
+            Loading attendance…
+          </td>
+
+        </tr>
+
+
+      </tbody>
+
+
+    </table>
+
+
+  </div>
+
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- SESSION JAVASCRIPT -->
+<!-- ====================================================== -->
+
+<script
+  src="{{ url_for('static', filename='session.js') }}"
+  defer
+></script>
+
+
+{% endblock %}
