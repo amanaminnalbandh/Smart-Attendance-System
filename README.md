@@ -4,11 +4,7 @@ A supervised educational attendance project built for Windows. This system utili
 
 ---
 
-## 🎓 Academic Credentials
-* **Developer:** Amanul Amin Nalbandh (Aman)
-* **Degree:** Bachelor of Computer Applications (BCA)
-* **University:** Bhagwan Mahavir University
-* **Enrollment No:** 2302020101243
+
 
 ---
 
