@@ -14,7 +14,7 @@ This project eliminates proxy attendance by enforcing physical presence through 
 ## 🛠️ Technical Stack
 * **Backend:** Python 3.12, Flask
 * **Computer Vision:** OpenCV (LBPH Face Recognizer, Haar Cascades)
-* **Database:** SQLite
+* **Database:** mongodb
 * **Frontend:** HTML5, CSS3, JavaScript (Webcam integration)
 * **Deployment:** Localhost (Windows PowerShell), optional Cloud (Render)
 
